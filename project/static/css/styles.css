@@ -1,0 +1,68 @@
+body {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 1.5em;
+    background-image: url(cool-background.png);
+    background-size: cover;
+
+}
+
+ul[class="nav"]{
+  height: 100%;
+  width: 160px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  margin: 0px;
+  background-color: #000;
+  overflow-x: hidden;
+  padding-top: 20px;
+  opacity: 0.5;
+}
+
+.nav > li {
+    float: left;
+}
+
+.nav > li a {
+  padding: 6px 10px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #ffffff;
+  display: block;
+  transition: 0.4s;
+}
+
+.drift
+{
+    margin-left: 200px;
+}
+
+.nav > li a:hover {
+    background-color: #4774da;
+}
+
+input, select {
+    width: 500px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 3px solid #ccc;
+    border-radius: 15px;
+    box-sizing: border-box;
+}
+
+input:focus {
+  background-color: lightblue;
+}
+
+input[type=submit] {
+    width: 500px;
+    background-color: #343c73;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
