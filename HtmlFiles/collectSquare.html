@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#canvas {
+  width: 600px;
+  height: 400px;
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas" width="600" height="400" tabindex="1"></canvas>
+
+<audio autoplay loop id="music">
+<source src="HAPPY.ogg" type="audio/ogg">
+</audio>
+
+<script>
+// Collect The Square game
+
+//Function to play music
+function play() {
+  var audio = document.getElementById("music");;
+  audio.play();
+}
+
+// Get a reference to the canvas DOM element
+var canvas = document.getElementById('canvas');
+// Get the canvas drawing context
+var context = canvas.getContext('2d');
+
+// Your score
+var score = 0;
+
+// Properties for your square
+var x = 50; // X position
+var y = 100; // Y position
+var speed = 6; // Distance to move each frame
+var sideLength = 50; // Length of each side of the square
+
+// FLags to track which keys are pressed
+var down = false;
+var up = false;
+var right = false;
+var left = false;
+var space = false;
+
+// Properties for the target square
+var targetX = 0;
+var targetY = 0;
+var targetLength = 25;
+
+// Properties for the speed square
+var target2X = -50;
+var target2Y = -50;
+var targetLength2 = 10;
+
+// Properties for the speed square
+var target3X = -50;
+var target3Y = -50;
+var targetLength3 = 15;
+
+var holdX = -50;
+var holdY = -50;
+
+// Determine if number a is within the range b to c (exclusive)
+function isWithin(a, b, c) {
+  return (a > b && a < c);
+}
+
+// Countdown timer (in seconds)
+var countdown = 45 ;
+// ID to track the setTimeout
+var id = null;
+//Extra Speed timer (seconds)
+var EXspeed = 0;
+var speedId = null;
+
+var holder = 0;
+
+// Listen for keydown events
+canvas.addEventListener('keydown', function(event) {
+  event.preventDefault();
+  console.log(event.key, event.keyCode);
+  if (event.keyCode === 40) { // DOWN
+    down = true;
+  }
+  if (event.keyCode === 38) { // UP
+    up = true;
+  }
+  if (event.keyCode === 37) { // LEFT
+    left = true;
+  }
+  if (event.keyCode === 39) { // RIGHT
+    right = true;
+  }
+  if (event.keyCode === 32) { // SPACE
+    space = true;
+  }
+});
+
+// Listen for keyup events
+canvas.addEventListener('keyup', function(event) {
+  event.preventDefault();
+  console.log(event.key, event.keyCode);
+  if (event.keyCode === 40) { // DOWN
+    down = false;
+  }
+  if (event.keyCode === 38) { // UP
+    up = false;
+  }
+  if (event.keyCode === 37) { // LEFT
+    left = false;
+  }
+  if (event.keyCode === 39) { // RIGHT
+    right = false;
+  }
+  if (event.keyCode === 32) { // SPACE
+    space = false;
+  }
+});
+
+// Show the start menu
+function menu() {
+  erase();
+  context.fillStyle = '#000000';
+  context.font = '36px Arial';
+  context.textAlign = 'center';
+  context.fillText('Collect the Square!', canvas.width / 2, canvas.height / 4);
+  context.font = '24px Arial';
+  context.fillText('Click to Start', canvas.width / 2, canvas.height / 2);
+  context.font = '18px Arial'
+  context.fillText('Use the arrow keys to move', canvas.width / 2, (canvas.height / 4) * 3);
+  context.fillText('Collect purple squares to grow', canvas.width / 2, (canvas.height / 4) * 3 + 25);
+  context.fillText('Collect blue squares to gain speed by holding space', canvas.width / 2, (canvas.height / 4) * 3 + 50);
+  context.fillText('Green Silhouttes show the next position of the target', canvas.width / 2, (canvas.height / 4) * 3 + 75);
+  // Start the game on a click
+  canvas.addEventListener('click', startGame);
+}
+
+// Start the game
+function startGame() {
+	// Reduce the countdown timer ever second
+  id = setInterval(function() {
+    countdown--;
+    if(EXspeed != 0 && space == true){
+      EXspeed--;
+    }
+  }, 1000)
+  play();
+  // Stop listening for click events
+  canvas.removeEventListener('click', startGame);
+  // Put the target at a random starting point
+	moveTarget();
+  // Kick off the draw loop
+  draw();
+}
+
+// Show the game over screen
+function endGame() {
+	// Stop the countdown
+  clearInterval(id);
+  // Display the final score
+  erase();
+  context.fillStyle = '#000000';
+  context.font = '24px Arial';
+  context.textAlign = 'center';
+  context.fillText('Final Score: ' + score, canvas.width / 2, canvas.height / 2);
+}
+
+// Move the target square to a random position
+function moveTarget() {
+  targetX = Math.round(Math.random() * canvas.width - targetLength);
+  targetY = Math.round(Math.random() * canvas.height - targetLength)
+}
+
+// Move the speed square to a random position
+function moveTarget2() {
+  target2X = Math.round(Math.random() * canvas.width - targetLength);
+  target2Y = Math.round(Math.random() * canvas.height - targetLength)
+}
+
+//Move the growth square to a random position
+function moveTarget3() {
+  target3X = Math.round(Math.random() * canvas.width - targetLength);
+  target3Y = Math.round(Math.random() * canvas.height - targetLength)
+}
+
+//Move the silhouette square to a random position
+function moveTarget4() {
+  holdX = Math.round(Math.random() * canvas.width - targetLength);
+  holdY = Math.round(Math.random() * canvas.height - targetLength)
+}
+
+// Clear the canvas
+function erase() {
+  context.fillStyle = '#FFFFFF';
+  context.fillRect(0, 0, 600, 400);
+}
+
+// The main draw loop
+function draw() {
+  erase();
+  // Move the square
+  if (down) {
+    if(EXspeed > 0 && space == true) {
+      y += speed*1.5;
+    } else
+      y += speed;
+  }
+  if (up) {
+    if(EXspeed > 0 && space == true) {
+        y -= speed*1.5;
+    } else
+    y -= speed;
+  }
+  if (right) {
+    if(EXspeed > 0 && space == true) {
+        x += speed*1.5;
+    } else
+    x += speed;
+  }
+  if (left) {
+    if(EXspeed > 0 && space == true) {
+        x -= speed*1.5;
+    } else
+    x -= speed;
+  }
+  // Keep the square within the bounds
+  if (y + sideLength > canvas.height) {
+    y = canvas.height - sideLength;
+  }
+  if (y < 0) {
+    y = 0;
+  }
+  if (x < 0) {
+    x = 0;
+  }
+  if (x + sideLength > canvas.width) {
+    x = canvas.width - sideLength;
+  }
+  // Collide with the target
+  if (isWithin(targetX, x, x + sideLength) || isWithin(targetX + targetLength, x, x + sideLength)) { // X
+    if (isWithin(targetY, y, y + sideLength) || isWithin(targetY + targetLength, y, y + sideLength)) { // Y
+      // Respawn the target
+      if(holder > 1) {
+        targetX = holdX;
+        targetY = holdY;
+        holder--;
+        moveTarget4();
+      } else if (holder == 1) {
+        targetX = holdX;
+        targetY = holdY;
+        holder--;
+        holdX = -50;
+        holdY = -50;
+      } else {
+        moveTarget();
+      }
+      // Increase the score
+      score++;
+      //Random speed boost
+      var rand = Math.floor(Math.random() * Math.floor(10));
+    }
+  }
+  
+  if (isWithin(target2X, x, x + sideLength) || isWithin(target2X + targetLength2, x, x + sideLength)) { // X
+    if (isWithin(target2Y, y, y + sideLength) || isWithin(target2Y + targetLength2, y, y + sideLength)) { // Y
+      target2X = -50;
+      target2Y = -50;
+      EXspeed += 5;
+    }
+  }
+  
+  if (isWithin(target3X, x, x + sideLength) || isWithin(target3X + targetLength3, x, x + sideLength)) { // X
+    if (isWithin(target3Y, y, y + sideLength) || isWithin(target3Y + targetLength3, y, y + sideLength)) { // Y
+      target3X = -50;
+      target3Y = -50;
+      sideLength += 10;
+    }
+  }
+  
+  // Draw the square
+  context.fillStyle = '#FF0000';
+  context.fillRect(x, y, sideLength, sideLength);
+  // Draw the target 
+  context.fillStyle = '#00FF00';
+  context.fillRect(targetX, targetY, targetLength, targetLength);
+  
+  //Draw speed boost if rand == 0
+  if(rand <= 1  && target2X == -50) {
+    moveTarget2();
+  }
+  context.fillStyle = '#0000FF';
+  context.fillRect(target2X, target2Y, targetLength2, targetLength2);
+  
+  //Grows the square
+  if(rand == 2 && target3X == -50) {
+    moveTarget3();
+  }
+  context.fillStyle = '#6A0DAD';
+  context.fillRect(target3X, target3Y, targetLength3, targetLength3);
+  
+  if(rand == 3 && holdX == -50) {
+    holder += 2;
+    moveTarget4();
+  }
+  context.fillStyle = '#90EE90';
+  context.fillRect(holdX, holdY, targetLength, targetLength);
+  
+  // Draw the score and time remaining
+  context.fillStyle = '#000000';
+  context.font = '24px Arial';
+  context.textAlign = 'left';
+  context.fillText('Score: ' + score, 10, 24);
+  context.fillText('Time Remaining: ' + countdown, 10, 50);
+  context.fillText('Extra speed time: ' + EXspeed, 10, 390);
+  // End the game or keep playing
+  if (countdown <= 0) {
+    endGame();
+  } else {
+    window.requestAnimationFrame(draw);
+  }
+}
+
+// Start the game
+menu();
+canvas.focus();
+</script>
+</body>
+</html>
