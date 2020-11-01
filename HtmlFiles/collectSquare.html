@@ -10,9 +10,21 @@
 </style>
 </head>
 <body>
+
 <canvas id="canvas" width="600" height="400" tabindex="1"></canvas>
+
+<audio autoplay loop id="music">
+<source src="HAPPY.ogg" type="audio/ogg">
+</audio>
+
 <script>
 // Collect The Square game
+
+//Function to play music
+function play() {
+  var audio = document.getElementById("music");;
+  audio.play();
+}
 
 // Get a reference to the canvas DOM element
 var canvas = document.getElementById('canvas');
@@ -50,18 +62,23 @@ var target3X = -50;
 var target3Y = -50;
 var targetLength3 = 15;
 
+var holdX = -50;
+var holdY = -50;
+
 // Determine if number a is within the range b to c (exclusive)
 function isWithin(a, b, c) {
   return (a > b && a < c);
 }
 
 // Countdown timer (in seconds)
-var countdown = 30;
+var countdown = 45 ;
 // ID to track the setTimeout
 var id = null;
 //Extra Speed timer (seconds)
 var EXspeed = 0;
 var speedId = null;
+
+var holder = 0;
 
 // Listen for keydown events
 canvas.addEventListener('keydown', function(event) {
@@ -116,6 +133,9 @@ function menu() {
   context.fillText('Click to Start', canvas.width / 2, canvas.height / 2);
   context.font = '18px Arial'
   context.fillText('Use the arrow keys to move', canvas.width / 2, (canvas.height / 4) * 3);
+  context.fillText('Collect purple squares to grow', canvas.width / 2, (canvas.height / 4) * 3 + 25);
+  context.fillText('Collect blue squares to gain speed by holding space', canvas.width / 2, (canvas.height / 4) * 3 + 50);
+  context.fillText('Green Silhouttes show the next position of the target', canvas.width / 2, (canvas.height / 4) * 3 + 75);
   // Start the game on a click
   canvas.addEventListener('click', startGame);
 }
@@ -129,6 +149,7 @@ function startGame() {
       EXspeed--;
     }
   }, 1000)
+  play();
   // Stop listening for click events
   canvas.removeEventListener('click', startGame);
   // Put the target at a random starting point
@@ -155,15 +176,22 @@ function moveTarget() {
   targetY = Math.round(Math.random() * canvas.height - targetLength)
 }
 
-// Move the target square to a random position
+// Move the speed square to a random position
 function moveTarget2() {
   target2X = Math.round(Math.random() * canvas.width - targetLength);
   target2Y = Math.round(Math.random() * canvas.height - targetLength)
 }
 
+//Move the growth square to a random position
 function moveTarget3() {
   target3X = Math.round(Math.random() * canvas.width - targetLength);
   target3Y = Math.round(Math.random() * canvas.height - targetLength)
+}
+
+//Move the silhouette square to a random position
+function moveTarget4() {
+  holdX = Math.round(Math.random() * canvas.width - targetLength);
+  holdY = Math.round(Math.random() * canvas.height - targetLength)
 }
 
 // Clear the canvas
@@ -217,7 +245,20 @@ function draw() {
   if (isWithin(targetX, x, x + sideLength) || isWithin(targetX + targetLength, x, x + sideLength)) { // X
     if (isWithin(targetY, y, y + sideLength) || isWithin(targetY + targetLength, y, y + sideLength)) { // Y
       // Respawn the target
-      moveTarget();
+      if(holder > 1) {
+        targetX = holdX;
+        targetY = holdY;
+        holder--;
+        moveTarget4();
+      } else if (holder == 1) {
+        targetX = holdX;
+        targetY = holdY;
+        holder--;
+        holdX = -50;
+        holdY = -50;
+      } else {
+        moveTarget();
+      }
       // Increase the score
       score++;
       //Random speed boost
@@ -262,6 +303,13 @@ function draw() {
   context.fillStyle = '#6A0DAD';
   context.fillRect(target3X, target3Y, targetLength3, targetLength3);
   
+  if(rand == 3 && holdX == -50) {
+    holder += 2;
+    moveTarget4();
+  }
+  context.fillStyle = '#90EE90';
+  context.fillRect(holdX, holdY, targetLength, targetLength);
+  
   // Draw the score and time remaining
   context.fillStyle = '#000000';
   context.font = '24px Arial';
@@ -280,7 +328,6 @@ function draw() {
 // Start the game
 menu();
 canvas.focus();
-
 </script>
 </body>
 </html>
