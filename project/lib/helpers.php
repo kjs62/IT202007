@@ -67,6 +67,21 @@ function getMessages() {
     }
     return array();
 }
-
+function getTransactionType($n) {
+    switch ($n) {
+        case "Deposit":
+            echo "Deposit";
+            break;
+        case "Withdraw":
+            echo "Withdraw";
+            break;
+        case "Transfer":
+            echo "Transfer";
+            break;
+        default:
+            echo "Unsupported state: " . safer_echo($n);
+            break;
+    }
+}
 //end flash
 ?>
