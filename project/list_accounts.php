@@ -39,6 +39,9 @@ $results = [];
                         <div>Balance:</div>
                         <div><?php safer_echo($r["balance"]); ?></div>
                     </div>
+                    <div>
+                        <a type="button" href="transaction_history.php?id=<?php safer_echo($r['id']); ?>">View Transaction History</a>
+                    </div>
                     <br>
                 </div>
               <?php endif; ?>
