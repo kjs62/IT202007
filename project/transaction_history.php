@@ -1,11 +1,4 @@
 <?php require_once(__DIR__ . "/partials/nav.php"); ?>
-<?php
-if (!has_role("Admin")) {
-    //this will redirect to login and kill the rest of this script (prevent it from executing)
-    flash("You don't have permission to access this page");
-    die(header("Location: login.php"));
-}
-?>
 <div class="drift">
 <?php
 $query = "";
@@ -15,7 +8,7 @@ if (isset($_POST["query"])) {
 }
     $db = getDB();
     $UserId = get_user_id();
-    $stmt = $db->prepare("SELECT * from Transactions WHERE act_dest_id = $UserId like :q LIMIT 10");
+    $stmt = $db->prepare("SELECT * from Transactions WHERE act_src_id = $UserId like :q LIMIT 10");
     $r = $stmt->execute([":q" => "%$query%"]);
     if ($r) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -36,7 +29,7 @@ if (isset($_POST["query"])) {
             <?php foreach ($results as $r): ?>
                 <div class="list-group-item">
                     <?php foreach ($results2 as $r2): ?>
-                    <?php if ($r2["id"] == $r["act_dest_id"]): ?>
+                    <?php if ($r2["id"] == $r["act_src_id"]): ?>
                     <div>
                         <div>Transaction Number:</div>
                         <div><?php safer_echo($r["id"]); ?></div>
