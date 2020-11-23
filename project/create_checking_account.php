@@ -42,7 +42,6 @@ if(isset($_POST["save"])){
     if($r){
       $lastId = $db->lastInsertId();
   		flash("Account created successfully with id: " . $lastId);
-      die(header("Location: list_accounts.php"));
   	}
   	else{
   		$e = $stmt->errorInfo();
@@ -89,6 +88,7 @@ if(isset($_POST["save"])){
     }
     $stmt = $db->prepare("UPDATE Accounts SET balance = (SELECT SUM(amount) FROM Transactions WHERE Transactions.act_src_id = Accounts.id)");
     $r = $stmt->execute();
+	die(header("Location: list_accounts.php"));
   }
   else
   {
