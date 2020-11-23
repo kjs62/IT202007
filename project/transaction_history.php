@@ -11,7 +11,7 @@ $results = [];
 if (isset($id)) {
     $db = getDB();
     $UserId = get_user_id();
-    $stmt = $db->prepare("SELECT * from Transactions WHERE act_src_id like :q LIMIT 10");
+    $stmt = $db->prepare("SELECT * from Transactions WHERE act_src_id like :q ORDER BY id DESC LIMIT 10");
     $r = $stmt->execute([":q" => "%$id%"]);
     if ($r) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
