@@ -21,7 +21,6 @@ if(isset($_POST["save"])){
   }
   $accType = "Checking";
 	$user = get_user_id();
-  echo var_export($user, true);
   $balance = $_POST["balance"];
   if($balance >= 5)
   {
@@ -31,7 +30,7 @@ if(isset($_POST["save"])){
   		":accNum"=>$accNum,
   		":accType"=>$accType,
   		":user"=>$user,
-      ":balance"=>$balance
+      ":balance"=>0
       ]);
       $accNum = rand(000000000000, 999999999999);
       for($i = strlen($accNum); $i < 12; $i++)
@@ -43,7 +42,7 @@ if(isset($_POST["save"])){
     if($r){
       $lastId = $db->lastInsertId();
   		flash("Account created successfully with id: " . $lastId);
-      //die(header("Location: home.php"));
+      die(header("Location: list_accounts.php"));
   	}
   	else{
   		$e = $stmt->errorInfo();
@@ -88,10 +87,8 @@ if(isset($_POST["save"])){
          $e = $stmt->errorInfo();
          flash("Error creating: " . var_export($e, true));
     }
-    $stmt = $db->prepare("UPDATE Accounts set balance = :balance where id = 0");
-    $r = $stmt->execute([
-       ":balance"=>($a1total-$balance)
-    ]);
+    $stmt = $db->prepare("UPDATE Accounts SET balance = (SELECT SUM(amount) FROM Transactions WHERE Transactions.act_src_id = Accounts.id)");
+    $r = $stmt->execute();
   }
   else
   {
