@@ -16,6 +16,11 @@ require_once(__DIR__ . "/../lib/helpers.php");
         <li><a href="test_list_transactions.php">View Transactions</a></li>
     <?php endif; ?>
     <?php if (is_logged_in()): ?>
+        <li><a href="create_checking_account.php">Create Checking Account</a></li>
+        <li><a href="list_accounts.php">List Accounts</a></li>
+        <li><a href="deposit.php">Deposit</a></li>
+        <li><a href="withdraw.php">Withdraw</a></li>
+        <li><a href="#">Transfer</a></li>
         <li><a href="profile.php">Profile</a></li>
         <li><a href="logout.php">Logout</a></li>
     <?php endif; ?>
