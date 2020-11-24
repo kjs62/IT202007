@@ -75,7 +75,7 @@ function do_bank_action($account1, $account2, $amountChange, $memo){
     $stmt->bindValue(":memo", $memo);
   	$result = $stmt->execute();
     if ($result) {
-          flash("Created successfully with id: " . $db->lastInsertId());
+          flash("Withdrawal successfully made");
       }
       else {
           $e = $stmt->errorInfo();
@@ -96,7 +96,10 @@ if (isset($_POST["save"])) {
     $dest = $_POST["dest"];
     $memo = $_POST["memo"];
     $user = get_user_id();
-    do_bank_action($dest, "000000000000", ($amount * -1), $memo);
+    if($amount > 0)
+      do_bank_action($dest, "000000000000", ($amount * -1), $memo);
+    else
+      flash("Enter a positive value");
 }
 ?>
 </div>

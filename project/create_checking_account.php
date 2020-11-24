@@ -41,7 +41,7 @@ if(isset($_POST["save"])){
     }while($e[0] == "23000");
     if($r){
       $lastId = $db->lastInsertId();
-  		flash("Account created successfully with id: " . $lastId);
+  		flash("Account created successfully with account number: " . $accNum);
   	}
   	else{
   		$e = $stmt->errorInfo();
@@ -53,7 +53,6 @@ if(isset($_POST["save"])){
     $r2 = $stmt2->execute([":q" => "%$query%"]);
     if ($r2) {
           $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
-      
       }
    $a1total = null;
   foreach($results as $r)
@@ -80,7 +79,7 @@ if(isset($_POST["save"])){
   	$stmt->bindValue(":a2total", $balance);
   	$result = $stmt->execute();
     if ($result) {
-          flash("Transaction created successfully with id: " . $db->lastInsertId());
+          flash("Transaction created successfully");
       }
     else {
          $e = $stmt->errorInfo();
@@ -88,7 +87,7 @@ if(isset($_POST["save"])){
     }
     $stmt = $db->prepare("UPDATE Accounts SET balance = (SELECT SUM(amount) FROM Transactions WHERE Transactions.act_src_id = Accounts.id)");
     $r = $stmt->execute();
-	die(header("Location: list_accounts.php"));
+	  die(header("Location: list_accounts.php"));
   }
   else
   {

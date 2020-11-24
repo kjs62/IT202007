@@ -73,7 +73,7 @@ function do_bank_action($account1, $account2, $amountChange, $memo){
   $stmt->bindValue(":memo", $memo);
 	$result = $stmt->execute();
   if ($result) {
-        flash("Created successfully with id: " . $db->lastInsertId());
+        flash("Deposit successfully made");
     }
     else {
         $e = $stmt->errorInfo();
@@ -89,7 +89,10 @@ if (isset($_POST["save"])) {
     $source = $_POST["source"];
     $memo = $_POST["memo"];
     $user = get_user_id();
-    do_bank_action("0", $source, ($amount * -1), $memo);
+    if($amount > 0)
+      do_bank_action("000000000000", $source, ($amount * -1), $memo);
+    else
+      flash("Enter a positive value");
 }
 ?>
 </div>
