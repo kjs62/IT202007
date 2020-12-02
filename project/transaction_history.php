@@ -17,8 +17,8 @@ if (isset($id)) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    $stmt2 = $db->prepare("SELECT id, account_number, account_type from Accounts WHERE user_id = $UserId");
-  $r2 = $stmt2->execute([":q" => "%$query%"]);
+    $stmt2 = $db->prepare("SELECT id, account_number, account_type from Accounts WHERE user_id = :UserId");
+  $r2 = $stmt2->execute([":UserId" => $UserId]);
   if ($r2) {
         $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     }
