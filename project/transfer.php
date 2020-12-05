@@ -61,6 +61,9 @@ function do_bank_action($account1, $account2, $amountChange, $memo){
     if($account2 == $r["id"])
       $a2total = $r["balance"];
   }
+  
+  if($a1total+$amountChange >= 0)
+  {
 	$query = "INSERT INTO `Transactions` (`act_src_id`, `act_dest_id`, `amount`, `action_type`, `expected_total`, `memo`) 
 	VALUES(:p1a1, :p1a2, :p1change, :type, :a1total, :memo), 
 			(:p2a1, :p2a2, :p2change, :type, :a2total, :memo)";
@@ -90,6 +93,11 @@ function do_bank_action($account1, $account2, $amountChange, $memo){
     $stmt = $db->prepare("UPDATE Accounts SET balance = (SELECT SUM(amount) FROM Transactions WHERE Transactions.act_src_id = Accounts.id)");
     $r = $stmt->execute();
 	return $result;
+ }
+ else
+  {
+    flash("Error: You cannot transfer more than you have in your source account");
+  }
 }
 
 if (isset($_POST["save"])) {
@@ -98,10 +106,15 @@ if (isset($_POST["save"])) {
     $dest = $_POST["dest"];
     $memo = $_POST["memo"];
     $user = get_user_id();
-    if($amount > 0)
+    if($amount > 0 && $source != $dest)
       do_bank_action($source, $dest, ($amount * -1), $memo);
     else
-      flash("Enter a positive value");
+    {
+      if($amount <= 0)
+        flash("Enter a positive value");
+      if($source == $dest)
+        flash("Cannot transfer to the same account");
+    }
 }
 ?>
 </div>
