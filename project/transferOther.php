@@ -26,7 +26,7 @@ if ($r) {
         <br>
         <label>Enter the last 4 digits of the destination account number</label>
         <br>
-        <input type="int" maxlength = "4" name="dest"/>
+        <input type="int" maxlength ="4" name="dest"/>
         <br>
         <label>Enter the last name of the destination account user</label>
         <br>
