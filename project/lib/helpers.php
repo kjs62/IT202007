@@ -39,6 +39,20 @@ function get_user_id() {
     return -1;
 }
 
+function get_fName() {
+    if (is_logged_in() && isset($_SESSION["user"]["first_name"])) {
+        return $_SESSION["user"]["first_name"];
+    }
+    return "";
+}
+
+function get_lName() {
+    if (is_logged_in() && isset($_SESSION["user"]["last_name"])) {
+        return $_SESSION["user"]["last_name"];
+    }
+    return "";
+}
+
 function safer_echo($var) {
     if (!isset($var)) {
         echo "";
