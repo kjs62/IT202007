@@ -8,7 +8,7 @@ $transType = array("", "Transfer", "Withdraw", "Deposit");
 ?>
 <h3>Filter Transactions</h3>
     <form method="POST">
-        <label>Account Type</label>
+        <label>Filter by Account Type:</label>
         <br>
         <select name="tran">
             <?php foreach($transType as $tran): ?>
@@ -16,6 +16,8 @@ $transType = array("", "Transfer", "Withdraw", "Deposit");
             <?php endforeach; ?>
         </select>
         <br>
+        <br>
+        <label>Filter between dates:</label>
         <br>
         <label>Date 1</label>
         <br>
@@ -59,7 +61,8 @@ if (isset($id)) {
     $stmt->bindValue(":count", $per_page, PDO::PARAM_INT);
     $stmt->bindValue(":q", $id);
     
-    if(isset($_POST["filter"]) || $_SESSION['filtered'])
+    
+    if(isset($_POST["filter"]) || isset($_SESSION['filtered']))
     {
       if(isset($_POST["tran"]))
       {
@@ -68,26 +71,35 @@ if (isset($id)) {
       }
       else
         $actType = $_SESSION["tranActType"];
-        
-      if($_POST["startDate"] != "" && $_POST["endDate"] != "")
+      
+      $startDate = '0000-01-01';
+      $endDate = '9999-12-31';
+      
+      if(isset($_POST["startDate"]) || isset($_POST["endDate"]))
       {
-        $_SESSION["tranStart"] = $_POST["startDate"];
-        $_SESSION["tranEnd"] = $_POST["endDate"];
-        $startDate = $_SESSION["tranStart"];
-        $endDate = $_SESSION["tranEnd"];
+        if($_POST["startDate"] != "" && $_POST["endDate"] != "")
+        {
+          $_SESSION["tranStart"] = $_POST["startDate"];
+          $_SESSION["tranEnd"] = $_POST["endDate"];
+          $startDate = $_SESSION["tranStart"];
+          $endDate = $_SESSION["tranEnd"];
+        }
+        elseif(($_POST["startDate"] != "" && $_POST["endDate"] == "") || ($_POST["endDate"] != "" && $_POST["startDate"] == ""))
+        {
+          echo "Please enter both date fields to properly filter<br>Will continue search using dates 0000-01-01 and 9999-12-31";
+          $_SESSION["tranStart"] = '0000-01-01';
+          $_SESSION["tranEnd"] = '9999-12-31';
+          $startDate = $_SESSION["tranStart"];
+          $endDate = $_SESSION["tranEnd"];
+        }
       }
-      elseif(($_POST["startDate"] != "" && $_POST["endDate"] == "") || ($_POST["endDate"] != "" && $_POST["startDate"] == ""))
-      {
-        echo "Please enter both date fields to properly filter<br>Will continue search using dates 0000-01-01 and 9999-12-31";
-        $_SESSION["tranStart"] = '0000-01-01';
-        $_SESSION["tranEnd"] = '9999-12-31';
-        $startDate = $_SESSION["tranStart"];
-        $endDate = $_SESSION["tranEnd"];
-      }
-      elseif($_SESSION["filtered"])
-      {
-        $startDate = $_SESSION["tranStart"];
-        $endDate = $_SESSION["tranEnd"];
+      elseif(isset($_SESSION["filtered"]))
+      { 
+        if($_SESSION["filtered"])
+        {
+          $startDate = $_SESSION["tranStart"];
+          $endDate = $_SESSION["tranEnd"];
+        }
       }
       else
       {
@@ -143,7 +155,7 @@ if (isset($id)) {
     if(isset($_POST["reset"]))
     {
       unset($_POST["filter"]);
-      $_SESSION["filtered"] = false;
+      unset($_SESSION["filtered"]);
       die(header("Location: transaction_history.php?id=$id&page=1"));
     }
     
@@ -162,18 +174,24 @@ if (isset($id)) {
 <h3>List Transactions</h3>
 <div class="results">
   <label>Currently filtering by type:
-  <?php if($_SESSION['filtered']):
-      if($actType != ""):
-        echo $actType;
-      else:
-        echo "All";
+  <?php 
+    if(isset($_SESSION['filtered'])):
+      if($_SESSION['filtered']):
+        if($actType != ""):
+          echo $actType;
+        else:
+          echo "All";
+        endif;
       endif;
     else:
       echo "All";
     endif; ?>
      between Dates:
-    <?php if($_SESSION['filtered']):
-      echo $startDate . " and " . $endDate;
+    <?php 
+    if(isset($_SESSION['filtered'])):
+      if($_SESSION['filtered']):
+        echo $startDate . " and " . $endDate;
+      endif;
     else:
       echo "0000-01-01 and 9999-12-31";
     endif; ?>
@@ -222,7 +240,7 @@ if (isset($id)) {
       <?php for($i = 0; $i < $total_pages; $i++):?>
       <li class="page-item <?php echo ($page-1) == $i?"active":"";?>"><a class="page-link" href="?id=<?php echo $id;?>&page=<?php echo ($i+1);?>"><?php echo ($i+1);?></a></li>
       <?php endfor; ?>
-      <li class="page-item <?php echo ($page+1) >= $total_pages?"disabled":"";?>">
+      <li class="page-item <?php echo ($page+1) > $total_pages?"disabled":"";?>">
         <a class="page-link" href="?id=<?php echo $id;?>&page=<?php echo $page+1;?>">Next</a>
       </li>
     </ul>
