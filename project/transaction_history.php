@@ -4,7 +4,7 @@
 if (isset($_GET["id"])) {
     $id = $_GET["id"];
 }
-$transType = array("", "Transfer", "Withdraw", "Deposit");
+$transType = array("", "Transfer", "Ext-Transfer", "Withdraw", "Deposit");
 ?>
 <h3>Filter Transactions</h3>
     <form method="POST">
