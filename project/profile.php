@@ -83,9 +83,15 @@ if (isset($_POST["saved"])) {
         $newLName = $_POST["lName"];
     }
     
+    $isPublic = $_SESSION["user"]["isPublic"];
+      
+    if (($isPublic != $_POST["priv"])) {
+        $isPublic = $_POST["priv"];
+    }
+    
     if ($isValid) {
-        $stmt = $db->prepare("UPDATE Users set email = :email, username= :username, first_name = :fName, last_name = :lName where id = :id");
-        $r = $stmt->execute([":email" => $newEmail, ":username" => $newUsername, ":fName" => $newFName, ":lName" => $newLName, ":id" => get_user_id()]);
+        $stmt = $db->prepare("UPDATE Users set email = :email, username= :username, first_name = :fName, last_name = :lName, isPublic = :public where id = :id");
+        $r = $stmt->execute([":email" => $newEmail, ":username" => $newUsername, ":fName" => $newFName, ":lName" => $newLName, ":public" => $isPublic, ":id" => get_user_id()]);
         if ($r) {
             flash("Updated Username/Email");
         }
@@ -138,7 +144,7 @@ if (isset($_POST["saved"])) {
           }
         }
 //fetch/select fresh data in case anything changed
-        $stmt = $db->prepare("SELECT email, username, first_name, last_name from Users WHERE id = :id LIMIT 1");
+        $stmt = $db->prepare("SELECT email, username, first_name, last_name, isPublic from Users WHERE id = :id LIMIT 1");
         $stmt->execute([":id" => get_user_id()]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
@@ -146,11 +152,13 @@ if (isset($_POST["saved"])) {
             $username = $result["username"];
             $fName = $result["first_name"];
             $lName = $result["last_name"];
+            $isPublic = $result["isPublic"];
             //let's update our session too
             $_SESSION["user"]["email"] = $email;
             $_SESSION["user"]["username"] = $username;
             $_SESSION["user"]["first_name"] = $fName;
             $_SESSION["user"]["last_name"] = $lName;
+            $_SESSION["user"]["isPublic"] = $isPublic;
         }
     }
     else {
@@ -196,6 +204,18 @@ if (isset($_POST["saved"])) {
         <br>
         <input type="password" name="confirm"/>
         <br>
+        
+        <label for="privacy">Privacy Setting</label>
+        <br>
+        <div class="shift">
+        <input type="radio" name="priv" value="1" <?php echo ($_SESSION["user"]["isPublic"] == '1') ? 'checked="checked"' : ''; ?> />
+        <label>Public</label>
+        <br>
+        <input type="radio" name="priv" value="0" <?php echo ($_SESSION["user"]["isPublic"] == '0') ? 'checked="checked"' : ''; ?> />
+        <label>Private</label>
+        <br>
+        </div>
+        
         <input type="submit" name="saved" value="Save Profile"/>
     </form>
 </div>
