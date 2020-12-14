@@ -4,7 +4,7 @@
 $query = get_user_id();
 $results = [];
     $db = getDB();
-    $stmt = $db->prepare("SELECT id, account_number, user_id, account_type, balance from Accounts WHERE user_id like :q LIMIT 5");
+    $stmt = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND user_id like :q LIMIT 5");
     $r = $stmt->execute([":q" => "%$query%"]);
     if ($r) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -32,6 +32,16 @@ $results = [];
                         <div>Balance:</div>
                         <div><?php safer_echo($r["balance"]); ?></div>
                     </div>
+                    <?php if($r["APY"] != 0): ?>
+                    <div>
+                        <div>APY:</div>
+                        <div><?php safer_echo(($r["APY"] * 100) . "%"); ?></div>
+                    </div>
+                    <div>
+                        <div>Next APY Date:</div>
+                        <div><?php safer_echo($r["nextAPY"]); ?></div>
+                    </div>
+                    <?php endif; ?>
                     <div>
                         <a type="button" href="transaction_history.php?id=<?php safer_echo($r['id']); ?>">View Transaction History</a>
                     </div>
