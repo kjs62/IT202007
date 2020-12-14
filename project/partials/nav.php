@@ -38,12 +38,15 @@ require_once(__DIR__ . "/../lib/helpers.php");
     <?php endif; ?>
     <?php if (is_logged_in()): ?>
         <li><a href="create_checking_account.php">Create Checking Account</a></li>
+        <li><a href="create_saving_account.php">Create Saving Account</a></li>
         <li><a href="list_accounts.php">List Accounts</a></li>
         <li><a href="deposit.php">Deposit</a></li>
         <li><a href="withdraw.php">Withdraw</a></li>
         <li><a href="transfer.php">Transfer between yourself</a></li>
         <li><a href="transferOther.php">Transfer between others</a></li>
         <li><a href="profile.php?id=<?php safer_echo(get_user_id()); ?>">Profile</a></li>
+        <li><a href="takeLoan.php">Take out Loan</a></li>
+        <li><a href="closeAccount.php">Close Account</a></li>
         <li><a href="logout.php">Logout</a></li>
     <?php endif; ?>
 </ul>
