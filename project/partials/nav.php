@@ -43,7 +43,7 @@ require_once(__DIR__ . "/../lib/helpers.php");
         <li><a href="withdraw.php">Withdraw</a></li>
         <li><a href="transfer.php">Transfer between yourself</a></li>
         <li><a href="transferOther.php">Transfer between others</a></li>
-        <li><a href="profile.php">Profile</a></li>
+        <li><a href="profile.php?id=<?php safer_echo(get_user_id()); ?>">Profile</a></li>
         <li><a href="logout.php">Logout</a></li>
     <?php endif; ?>
 </ul>

@@ -2,8 +2,8 @@ body {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     font-size: 1.5em;
     background-image: url(cool-background.png);
-    background-size: cover;
-
+    background-repeat: no-repeat;
+    background-size: 200%;
 }
 
 ul[class="nav"]{
@@ -65,4 +65,12 @@ input[type=submit] {
     border: none;
     border-radius: 15px;
     cursor: pointer;
+}
+
+.shift label{
+  margin-left:-200px;
+}
+
+input[type=radio] {
+    margin-left: -200px;
 }

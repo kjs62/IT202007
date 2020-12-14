@@ -125,7 +125,7 @@ if (isset($_POST["save"])) {
         $currId = $curr["id"];
         $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND user_id like :q");
         $r2 = $stmt2->execute([":q" => "%$currId%"]);
-        if ($r) {
+        if ($r2) {
             $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         }
         foreach($results2 as $acc)
