@@ -5,6 +5,7 @@
   <label>Create Savings Account</label>
   <br>
   <label>APY will automatically be set to 8%</label>
+  <br>
   <label>Balance</label>
   <br>
 	<input id="bal" type="float" min="5.00" name="balance"/>
@@ -42,8 +43,11 @@ if(isset($_POST["save"])){
       }
       $e = $stmt->errorInfo();
     }while($e[0] == "23000");
+    $numOfMonths = 1;
+    $lastId = $db->lastInsertId();
+    $stmt = $db->prepare("UPDATE Accounts set nextAPY = TIMESTAMPADD(MONTH,:months,opened_date) WHERE id = :id");
+    $r = $stmt->execute([":id"=>$lastId, ":months"=>$numOfMonths]);
     if($r){
-      $lastId = $db->lastInsertId();
   		flash("Account created successfully with account number: " . $accNum);
   	}
   	else{

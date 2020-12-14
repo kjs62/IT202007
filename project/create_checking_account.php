@@ -25,7 +25,7 @@ if(isset($_POST["save"])){
   if($balance >= 5)
   {
     do {
-      $stmt = $db->prepare("INSERT INTO Accounts (account_number, account_type, user_id, balance) VALUES(:accNum, :accType, :user, :balance)");
+      $stmt = $db->prepare("INSERT INTO Accounts (account_number, account_type, user_id, balance, nextAPY) VALUES(:accNum, :accType, :user, :balance, null)");
   	$r = $stmt->execute([
   		":accNum"=>$accNum,
   		":accType"=>$accType,
