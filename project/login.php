@@ -35,10 +35,10 @@ if (isset($_POST["login"])) {
         $db = getDB();
         if (isset($db)) {
             if($isEmail) {
-                $stmt = $db->prepare("SELECT id, email, username, password from Users WHERE email = :email LIMIT 1");
+                $stmt = $db->prepare("SELECT id, email, username, password, isPublic from Users WHERE email = :email LIMIT 1");
             }
             else {
-                $stmt = $db->prepare("SELECT id, email, username, password from Users WHERE username = :email LIMIT 1"); 
+                $stmt = $db->prepare("SELECT id, email, username, password, isPublic from Users WHERE username = :email LIMIT 1"); 
             }
 
             $params = array(":email" => $email);
@@ -67,6 +67,7 @@ SELECT Roles.name FROM Roles JOIN UserRoles on Roles.id = UserRoles.role_id wher
                     else {
                         $_SESSION["user"]["roles"] = [];
                     }
+                    $_SESSION['user']['isPublic'] = $result['isPublic'];
                     //on successful login let's serve-side redirect the user to the home page.
                     flash("Log in successful");
                     die(header("Location: home.php"));

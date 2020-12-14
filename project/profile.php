@@ -1,17 +1,23 @@
 <?php require_once(__DIR__ . "/partials/nav.php"); ?>
 <div class="drift">
 <?php
-//Note: we have this up here, so our update happens before our get/fetch
-//that way we'll fetch the updated data and have it correctly reflect on the form below
-//As an exercise swap these two and see how things change
 if (!is_logged_in()) {
     //this will redirect to login and kill the rest of this script (prevent it from executing)
     flash("You must be logged in to access this page");
     die(header("Location: login.php"));
 }
 
+if (isset($_GET["id"])) {
+    $id = $_GET["id"];
+}
+
+if (isset($id)) {
 $db = getDB();
-//save data if we submitted the form
+$stmt = $db->prepare("SELECT * from Users where id = :id LIMIT 1");
+$stmt->execute([":id" => $id]);
+$results = $stmt->fetch(PDO::FETCH_ASSOC);
+$isVis = $results['isPublic'];
+
 if (isset($_POST["saved"])) {
     $isValid = true;
     //check if our email changed
@@ -19,13 +25,14 @@ if (isset($_POST["saved"])) {
     if (get_email() != $_POST["email"]) {
         //TODO we'll need to check if the email is available
         $email = $_POST["email"];
-        $stmt = $db->prepare("SELECT COUNT(1) as InUse from Users where email = :email");
-        $stmt->execute([":email" => $email]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $db->prepare("SELECT COUNT(1) as InUse from Users where id = :id");
+        $stmt->execute([":id" => $id]);
+        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+          
         $inUse = 1;//default it to a failure scenario
-        if ($result && isset($result["InUse"])) {
+        if ($results && isset($results["InUse"])) {
             try {
-                $inUse = intval($result["InUse"]);
+                $inUse = intval($results["InUse"]);
             }
             catch (Exception $e) {
 
@@ -83,17 +90,22 @@ if (isset($_POST["saved"])) {
         $newLName = $_POST["lName"];
     }
     
+    $isPublic = $_SESSION["user"]["isPublic"];
+      
+    if (($isPublic != $_POST["priv"])) {
+        $isPublic = $_POST["priv"];
+    }
+    
     if ($isValid) {
-        $stmt = $db->prepare("UPDATE Users set email = :email, username= :username, first_name = :fName, last_name = :lName where id = :id");
-        $r = $stmt->execute([":email" => $newEmail, ":username" => $newUsername, ":fName" => $newFName, ":lName" => $newLName, ":id" => get_user_id()]);
+        $stmt = $db->prepare("UPDATE Users set email = :email, username= :username, first_name = :fName, last_name = :lName, isPublic = :public where id = :id");
+        $r = $stmt->execute([":email" => $newEmail, ":username" => $newUsername, ":fName" => $newFName, ":lName" => $newLName, ":public" => $isPublic, ":id" => get_user_id()]);
         if ($r) {
             flash("Updated Username/Email");
         }
         else {
             flash("Error updating profile");
         }
-        //password is optional, so check if it's even set
-        //if so, then check if it's a valid reset request
+        
         if (!empty($_POST["password"]) && !empty($_POST["confirm"]) && !empty($_POST["current"])) {
         
           $curr = $_POST["current"];
@@ -138,7 +150,7 @@ if (isset($_POST["saved"])) {
           }
         }
 //fetch/select fresh data in case anything changed
-        $stmt = $db->prepare("SELECT email, username, first_name, last_name from Users WHERE id = :id LIMIT 1");
+        $stmt = $db->prepare("SELECT email, username, first_name, last_name, isPublic from Users WHERE id = :id LIMIT 1");
         $stmt->execute([":id" => get_user_id()]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
@@ -146,41 +158,47 @@ if (isset($_POST["saved"])) {
             $username = $result["username"];
             $fName = $result["first_name"];
             $lName = $result["last_name"];
+            $isPublic = $result["isPublic"];
             //let's update our session too
             $_SESSION["user"]["email"] = $email;
             $_SESSION["user"]["username"] = $username;
             $_SESSION["user"]["first_name"] = $fName;
             $_SESSION["user"]["last_name"] = $lName;
+            $_SESSION["user"]["isPublic"] = $isPublic;
         }
     }
     else {
         //else for $isValid, though don't need to put anything here since the specific failure will output the message
     }
+  }
 }
-
 
 ?>
 
     <form method="POST">
+        <?php if(($isVis == '1') || ($id == get_user_id())): ?>
         <label for="email">Email</label>
         <br>
-        <input type="email" name="email" value="<?php safer_echo(get_email()); ?>"/>
+        <input type="email" name="email" value="<?php safer_echo($results['email']); ?>"/>
         <br>
+        <?php endif; ?>
+        
         <label for="username">Username</label>
         <br>
-        <input type="text" maxlength="60" name="username" value="<?php safer_echo(get_username()); ?>"/>
+        <input type="text" maxlength="60" name="username" value="<?php safer_echo($results['username']); ?>"/>
         <br>
         
         <label for="fName">First Name</label>
         <br>
-        <input type="text" name="fName" value="<?php safer_echo(get_fName()); ?>"/>
+        <input type="text" name="fName" value="<?php safer_echo($results['first_name']); ?>"/>
         <br>
         
         <label for="lName">Last Name</label>
         <br>
-        <input type="text" name="lName" value="<?php safer_echo(get_lName()); ?>"/>
+        <input type="text" name="lName" value="<?php safer_echo($results['last_name']); ?>"/>
         <br>
         
+        <?php if($id == get_user_id()): ?>
         <!-- DO NOT PRELOAD PASSWORD-->
         
         <label for="current">Current Password</label>
@@ -196,7 +214,19 @@ if (isset($_POST["saved"])) {
         <br>
         <input type="password" name="confirm"/>
         <br>
+        
+        <label for="privacy">Privacy Setting</label>
+        <br>
+        <div class="shift">
+        <input type="radio" name="priv" value="1" <?php echo ($_SESSION["user"]["isPublic"] == '1') ? 'checked="checked"' : ''; ?> />
+        <label>Public</label>
+        <br>
+        <input type="radio" name="priv" value="0" <?php echo ($_SESSION["user"]["isPublic"] == '0') ? 'checked="checked"' : ''; ?> />
+        <label>Private</label>
+        <br>
+        </div>
         <input type="submit" name="saved" value="Save Profile"/>
+        <?php endif; ?>
     </form>
 </div>
 <?php require(__DIR__ . "/partials/flash.php");

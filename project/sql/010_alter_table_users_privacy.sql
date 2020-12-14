@@ -1,0 +1,2 @@
+ALTER TABLE Users
+	ADD COLUMN isPublic INT DEFAULT 1;
