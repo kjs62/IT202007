@@ -5,7 +5,7 @@
 $db = getDB();
 $users = [];
 $id = get_user_id();
-$stmt = $db->prepare("SELECT * from Accounts WHERE user_id = :id");
+$stmt = $db->prepare("SELECT * from Accounts WHERE (account_type != 'Loan') AND user_id = :id");
 $r = $stmt->execute([":id" => $id]);
 if ($r) {
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
