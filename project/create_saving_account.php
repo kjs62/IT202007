@@ -2,29 +2,15 @@
 <?php require_once(__DIR__ . "/partials/nav.php"); ?>
 <div class="drift">
 <form method="POST">
-  <label>Create Savings Account</labe>
+  <label>Create Savings Account</label>
   <br>
+  <label>APY will automatically be set to 8%</label>
   <label>Balance</label>
   <br>
 	<input id="bal" type="float" min="5.00" name="balance"/>
  <br>
 	<input type="submit" name="save" value="Create"/>
 </form>
-
-<html>
-<body>
-<p id="apyMessage"></p>
-  <script>
-    function myFunction() {
-      var x = document.getElementByName("balance")[0].value;
-      if(x >= 5)
-        document.getElementById("apyMessage").innerHTML = "APY will be 0.08%";
-      else
-        document.getElementById("apyMessage").innerHTML = 'APY cannot be calculated, balance needs to be more than $5.00';
-    }
-  </script>
-</body>
-</html>
 <?php
 if(isset($_POST["save"])){
 	//TODO add proper validation/checks
@@ -36,15 +22,17 @@ if(isset($_POST["save"])){
   }
   $accType = "Savings";
 	$user = get_user_id();
+  $apy = 0.08;
   $balance = $_POST["balance"];
   if($balance >= 5)
   {
     do {
-      $stmt = $db->prepare("INSERT INTO Accounts (account_number, account_type, user_id, balance) VALUES(:accNum, :accType, :user, :balance)");
+      $stmt = $db->prepare("INSERT INTO Accounts (account_number, account_type, user_id, balance, APY) VALUES(:accNum, :accType, :user, :balance, :apy)");
   	$r = $stmt->execute([
   		":accNum"=>$accNum,
   		":accType"=>$accType,
   		":user"=>$user,
+      ":apy" => $apy,
       ":balance"=>0
       ]);
       $accNum = rand(000000000000, 999999999999);

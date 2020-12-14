@@ -5,7 +5,7 @@
 $db = getDB();
 $users = [];
 $id = get_user_id();
-$stmt = $db->prepare("SELECT * from Accounts WHERE (account_type != 'Loan') AND user_id = :id");
+$stmt = $db->prepare("SELECT * from Accounts WHERE (account_type != 'Loan') AND active = 'active' AND user_id = :id");
 $r = $stmt->execute([":id" => $id]);
 if ($r) {
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -38,7 +38,7 @@ if ($r) {
 function do_bank_action($account1, $account2, $amountChange, $memo){
   $db = getDB();
   $query = null;
-  $stmt2 = $db->prepare("SELECT id, account_number, user_id, account_type, opened_date, last_updated, balance from Accounts WHERE id like :q");
+  $stmt2 = $db->prepare("SELECT id, account_number, user_id, account_type, opened_date, last_updated, balance from Accounts WHERE active = 'active' AND id like :q");
   $r2 = $stmt2->execute([":q" => "%$query%"]);
   if ($r2) {
         $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
