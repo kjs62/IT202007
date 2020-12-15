@@ -29,18 +29,18 @@ else
 if (isset($_POST["saved"])) {
     $isValid = true;
     //check if our email changed
-    $newEmail = get_email();
-    if (get_email() != $_POST["email"]) {
+    $newEmail = $results['email'];
+    if ($results['email'] != $_POST["email"]) {
         //TODO we'll need to check if the email is available
         $email = $_POST["email"];
         $stmt = $db->prepare("SELECT COUNT(1) as InUse from Users where email = :email");
         $stmt->execute([":email" => $email]);
-        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+        $results2 = $stmt->fetch(PDO::FETCH_ASSOC);
           
         $inUse = 1;//default it to a failure scenario
-        if ($results && isset($results["InUse"])) {
+        if ($results2 && isset($results2["InUse"])) {
             try {
-                $inUse = intval($results["InUse"]);
+                $inUse = intval($results2["InUse"]);
             }
             catch (Exception $e) {
 
@@ -56,8 +56,8 @@ if (isset($_POST["saved"])) {
         }
     }
     
-    $newUsername = get_username();
-    if (get_username() != $_POST["username"]) {
+    $newUsername = $results['username'];
+    if ($results['username'] != $_POST["username"]) {
         $username = $_POST["username"];
         $stmt = $db->prepare("SELECT COUNT(1) as InUse from Users where username = :username");
          $stmt->execute([":username" => $username]);
@@ -106,9 +106,9 @@ if (isset($_POST["saved"])) {
     
     if ($isValid) {
         $stmt = $db->prepare("UPDATE Users set email = :email, username= :username, first_name = :fName, last_name = :lName, isPublic = :public where id = :id");
-        $r = $stmt->execute([":email" => $newEmail, ":username" => $newUsername, ":fName" => $newFName, ":lName" => $newLName, ":public" => $isPublic, ":id" => get_user_id()]);
+        $r = $stmt->execute([":email" => $newEmail, ":username" => $newUsername, ":fName" => $newFName, ":lName" => $newLName, ":public" => $isPublic, ":id" => $id]);
         if ($r) {
-            flash("Updated Username/Email");
+            flash("Updated Username/Email/Privacy");
         }
         else {
             flash("Error updating profile");
@@ -159,9 +159,9 @@ if (isset($_POST["saved"])) {
         }
 //fetch/select fresh data in case anything changed
         $stmt = $db->prepare("SELECT email, username, first_name, last_name, isPublic from Users WHERE id = :id LIMIT 1");
-        $stmt->execute([":id" => get_user_id()]);
+        $stmt->execute([":id" => $id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
+        if ($result && ! has_role("Admin")) {
             $email = $result["email"];
             $username = $result["username"];
             $fName = $result["first_name"];
@@ -185,7 +185,7 @@ if (isset($_POST["saved"])) {
 ?>
   <?php if($id != -1): ?>
     <form method="POST">
-        <?php if(($isVis == '1') || ($id == get_user_id())): ?>
+        <?php if(($isVis == '1') || ($id == get_user_id()) || has_role("Admin")): ?>
         <label for="email">Email</label>
         <br>
         <input type="email" name="email" value="<?php safer_echo($results['email']); ?>"/>
@@ -207,7 +207,7 @@ if (isset($_POST["saved"])) {
         <input type="text" name="lName" value="<?php safer_echo($results['last_name']); ?>"/>
         <br>
         
-        <?php if($id == get_user_id()): ?>
+        <?php if($id == get_user_id() || has_role("Admin")): ?>
         <!-- DO NOT PRELOAD PASSWORD-->
         
         <label for="current">Current Password</label>
