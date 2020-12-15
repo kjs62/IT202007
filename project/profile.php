@@ -14,9 +14,17 @@ if (isset($_GET["id"])) {
 if (isset($id)) {
 $db = getDB();
 $stmt = $db->prepare("SELECT * from Users where id = :id LIMIT 1");
-$stmt->execute([":id" => $id]);
+$r = $stmt->execute([":id" => $id]);
 $results = $stmt->fetch(PDO::FETCH_ASSOC);
-$isVis = $results['isPublic'];
+$isVis = null;
+if(isset($results['id']))
+{
+  $isVis = $results['isPublic'];
+}
+else
+{
+  $id = -1;
+}
 
 if (isset($_POST["saved"])) {
     $isValid = true;
@@ -25,8 +33,8 @@ if (isset($_POST["saved"])) {
     if (get_email() != $_POST["email"]) {
         //TODO we'll need to check if the email is available
         $email = $_POST["email"];
-        $stmt = $db->prepare("SELECT COUNT(1) as InUse from Users where id = :id");
-        $stmt->execute([":id" => $id]);
+        $stmt = $db->prepare("SELECT COUNT(1) as InUse from Users where email = :email");
+        $stmt->execute([":email" => $email]);
         $results = $stmt->fetch(PDO::FETCH_ASSOC);
           
         $inUse = 1;//default it to a failure scenario
@@ -166,6 +174,7 @@ if (isset($_POST["saved"])) {
             $_SESSION["user"]["last_name"] = $lName;
             $_SESSION["user"]["isPublic"] = $isPublic;
         }
+        die(header("Location: profile.php?id=$id"));
     }
     else {
         //else for $isValid, though don't need to put anything here since the specific failure will output the message
@@ -174,7 +183,7 @@ if (isset($_POST["saved"])) {
 }
 
 ?>
-
+  <?php if($id != -1): ?>
     <form method="POST">
         <?php if(($isVis == '1') || ($id == get_user_id())): ?>
         <label for="email">Email</label>
@@ -228,5 +237,8 @@ if (isset($_POST["saved"])) {
         <input type="submit" name="saved" value="Save Profile"/>
         <?php endif; ?>
     </form>
+  <?php else: ?>
+    <label>User id does not exist</label>
+  <?php endif; ?>
 </div>
 <?php require(__DIR__ . "/partials/flash.php");
