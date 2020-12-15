@@ -60,7 +60,7 @@ if (isset($_POST["save2"])) {
         </select>
         <br>
         <input type="submit" name="save" value="Close"/>
-        
+        <br>
         <label>Account to Open</label>
         <br>
         <select name="reopen">
