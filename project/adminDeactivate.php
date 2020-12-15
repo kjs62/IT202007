@@ -60,7 +60,7 @@ if (isset($_POST["save2"])) {
         </select>
         <br>
         <input type="submit" name="save" value="Deactivate"/>
-        
+        <br>
         <label>User to Reactivate</label>
         <br>
         <select name="activate">
