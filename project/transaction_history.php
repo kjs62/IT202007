@@ -68,6 +68,8 @@ if (isset($id)) {
       {
         $_SESSION["tranActType"] = $_POST["tran"];
         $actType = $_SESSION["tranActType"];
+        $_SESSION["tranStart"] = '0000-01-01';
+        $_SESSION["tranEnd"] = '9999-12-31';
       }
       else
         $actType = $_SESSION["tranActType"];
@@ -156,6 +158,8 @@ if (isset($id)) {
     {
       unset($_POST["filter"]);
       unset($_SESSION["filtered"]);
+      $_SESSION["tranStart"] = '0000-01-01';
+      $_SESSION["tranEnd"] = '9999-12-31';
       die(header("Location: transaction_history.php?id=$id&page=1"));
     }
     
@@ -168,6 +172,23 @@ if (isset($id)) {
   $r2 = $stmt2->execute([":UserId" => $UserId]);
   if ($r2) {
         $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    $ownAcc = false;
+    foreach($results2 as $curr)
+    {
+      if($curr['id'] == $id)
+        $ownAcc = true;
+    }
+    
+    if(has_role("Admin"))
+    {
+      $ownAcc = true;
+      $stmt2 = $db->prepare("SELECT id, account_number, account_type from Accounts WHERE id = :id");
+      $r2 = $stmt2->execute([":id" => $id]);
+      if ($r2) {
+          $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+      }
     }
 }
 ?>
@@ -196,6 +217,7 @@ if (isset($id)) {
       echo "0000-01-01 and 9999-12-31";
     endif; ?>
     </label>
+    <?php if ($ownAcc): ?>
     <?php if (count($results) > 0): ?>
         <div class="list-group">
             <?php foreach ($results as $r): ?>
@@ -227,6 +249,10 @@ if (isset($id)) {
     <?php else: ?>
         <p>No results</p>
     <?php endif; ?>
+    <?php else: ?>
+      <h1>This is not your account</h1>
+    <?php endif; ?>
+    
 </div>
 <form method="POST">
   <h3>Reset Filter</h3>
