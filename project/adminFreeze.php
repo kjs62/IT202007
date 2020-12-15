@@ -60,7 +60,7 @@ if (isset($_POST["save2"])) {
         </select>
         <br>
         <input type="submit" name="save" value="Freeze"/>
-        
+        <br>
         <label>Account to Unfreeze</label>
         <br>
         <select name="toUnfreeze">
