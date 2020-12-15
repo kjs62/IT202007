@@ -5,7 +5,7 @@
 $db = getDB();
 $users = [];
 $id = get_user_id();
-$stmt = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND user_id = :id");
+$stmt = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND user_id = :id");
 $r = $stmt->execute([":id" => $id]);
 if ($r) {
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -48,7 +48,7 @@ if ($r) {
 function do_bank_action($account1, $account2, $amountChange, $memo){
   $db = getDB();
   $query = "";
-  $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND id like :q");
+  $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND id like :q");
   $r2 = $stmt2->execute([":q" => "%$query%"]);
   if ($r2) {
         $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
@@ -123,7 +123,7 @@ if (isset($_POST["save"])) {
       if($curr["last_name"] == $lastName)
       {
         $currId = $curr["id"];
-        $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND user_id like :q");
+        $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND user_id like :q");
         $r2 = $stmt2->execute([":q" => "%$currId%"]);
         if ($r2) {
             $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
@@ -155,7 +155,10 @@ if (isset($_POST["save"])) {
       }
     }
     else
+    {
       flash("No such account is found");
+      flash("Account may be frozen or closed");
+    }
 }
 ?>
 </div>

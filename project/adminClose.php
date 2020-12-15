@@ -17,19 +17,19 @@ if ($r) {
 }
 
 $users2 = [];
-$stmt = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'true'");
+$stmt = $db->prepare("SELECT * from Accounts WHERE active = 'closed' AND frozen = 'false'");
 $r = $stmt->execute();
 if ($r) {
     $users2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 if (isset($_POST["save"])) {
-  $toFreeze = $_POST['toFreeze'];
-  $stmt = $db->prepare("UPDATE Accounts set frozen = 'true' where active = 'active' and id = :id");
-  $r = $stmt->execute([":id" => $toFreeze]);
+  $close = $_POST['close'];
+  $stmt = $db->prepare("UPDATE Accounts set active = 'closed' where active = 'active' and id = :id");
+  $r = $stmt->execute([":id" => $close]);
   if ($r) {
-    flash("Account was frozen");
-    die(header("Location: adminFreeze.php"));
+    flash("Account was closed");
+    die(header("Location: adminClose.php"));
   }
   else {
     flash("Error updating account");
@@ -37,12 +37,12 @@ if (isset($_POST["save"])) {
 }
 
 if (isset($_POST["save2"])) {
-  $toUnfreeze = $_POST['toUnfreeze'];
-  $stmt = $db->prepare("UPDATE Accounts set frozen = 'false' where active = 'active' and id = :id");
-  $r = $stmt->execute([":id" => $toUnfreeze]);
+  $reopen = $_POST['reopen'];
+  $stmt = $db->prepare("UPDATE Accounts set active = 'active' where active = 'closed' and id = :id");
+  $r = $stmt->execute([":id" => $reopen]);
   if ($r) {
-    flash("Account was unfrozen");
-    die(header("Location: adminFreeze.php"));
+    flash("Account was reopened");
+    die(header("Location: adminClose.php"));
   }
   else {
     flash("Error updating account");
@@ -51,24 +51,24 @@ if (isset($_POST["save2"])) {
 ?>
 
 <form method="POST">
-        <label>Account to Freeze</label>
+        <label>Account to Close</label>
         <br>
-        <select name="toFreeze">
+        <select name="close">
             <?php foreach($users as $user): ?>
               <option value="<?= $user['id']; ?>"><?= $user['account_number']; ?></option>
             <?php endforeach; ?>
         </select>
         <br>
-        <input type="submit" name="save" value="Freeze"/>
+        <input type="submit" name="save" value="Close"/>
         
-        <label>Account to Unfreeze</label>
+        <label>Account to Open</label>
         <br>
-        <select name="toUnfreeze">
+        <select name="reopen">
             <?php foreach($users2 as $user2): ?>
               <option value="<?= $user2['id']; ?>"><?= $user2['account_number']; ?></option>
             <?php endforeach; ?>
         </select>
         <br>
-        <input type="submit" name="save2" value="Unfreeze"/>
+        <input type="submit" name="save2" value="Reopen"/>
 </drift>
 <?php require(__DIR__ . "/partials/flash.php");
