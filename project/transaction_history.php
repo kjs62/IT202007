@@ -46,8 +46,8 @@ if (isset($id)) {
         }
     }
     
-    $stmt = $db->prepare("SELECT count(*) as total from Transactions WHERE act_src_id like :q ORDER BY id DESC LIMIT 10");
-    $r = $stmt->execute([":q" => "%$id%"]);
+    $stmt = $db->prepare("SELECT count(*) as total from Transactions WHERE act_src_id = :q ORDER BY id DESC LIMIT 10");
+    $r = $stmt->execute([":q" => $id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $total = 0;
     if($result){
@@ -115,8 +115,8 @@ if (isset($id)) {
       
       if($actType != "")
       {
-        $stmt = $db->prepare("SELECT count(*) as total from Transactions WHERE (action_type like :a) AND (act_src_id like :q) AND (created BETWEEN :s AND :e) ORDER BY id DESC LIMIT 10");
-        $r = $stmt->execute([":q" => "%$id%", ":a" => $actType, ":s" => $startDate, ":e" => $endDate]);
+        $stmt = $db->prepare("SELECT count(*) as total from Transactions WHERE (action_type like :a) AND (act_src_id = :q) AND (created BETWEEN :s AND :e) ORDER BY id DESC LIMIT 10");
+        $r = $stmt->execute([":q" => $id, ":a" => $actType, ":s" => $startDate, ":e" => $endDate]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $total = 0;
         if($result){
@@ -135,8 +135,8 @@ if (isset($id)) {
       }
       else
       {
-        $stmt = $db->prepare("SELECT count(*) as total from Transactions WHERE (act_src_id like :q) AND (created BETWEEN :s AND :e) ORDER BY id DESC LIMIT 10");
-        $r = $stmt->execute([":q" => "%$id%", ":s" => $startDate, ":e" => $endDate]);
+        $stmt = $db->prepare("SELECT count(*) as total from Transactions WHERE (act_src_id = :q) AND (created BETWEEN :s AND :e) ORDER BY id DESC LIMIT 10");
+        $r = $stmt->execute([":q" => $id, ":s" => $startDate, ":e" => $endDate]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $total = 0;
         if($result){

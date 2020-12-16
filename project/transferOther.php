@@ -48,8 +48,8 @@ if ($r) {
 function do_bank_action($account1, $account2, $amountChange, $memo){
   $db = getDB();
   $query = "";
-  $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND id like :q");
-  $r2 = $stmt2->execute([":q" => "%$query%"]);
+  $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND id = :q");
+  $r2 = $stmt2->execute([":q" => $query]);
   if ($r2) {
         $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -112,8 +112,8 @@ if (isset($_POST["save"])) {
     $user = get_user_id();
     
     $isValid = false;
-    $stmt = $db->prepare("SELECT * from Users WHERE id like :q");
-    $r = $stmt->execute([":q" => "%$query%"]);
+    $stmt = $db->prepare("SELECT * from Users WHERE id = :q");
+    $r = $stmt->execute([":q" => $query]);
     if ($r) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -123,8 +123,8 @@ if (isset($_POST["save"])) {
       if($curr["last_name"] == $lastName)
       {
         $currId = $curr["id"];
-        $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND user_id like :q");
-        $r2 = $stmt2->execute([":q" => "%$currId%"]);
+        $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND user_id = :q");
+        $r2 = $stmt2->execute([":q" => $currId]);
         if ($r2) {
             $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         }

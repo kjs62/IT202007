@@ -38,8 +38,8 @@ if ($r) {
 function do_bank_action($account1, $account2, $amountChange, $memo){
   $db = getDB();
   $query = null;
-  $stmt2 = $db->prepare("SELECT id, account_number, user_id, account_type, opened_date, last_updated, balance from Accounts WHERE id like :q");
-  $r2 = $stmt2->execute([":q" => "%$query%"]);
+  $stmt2 = $db->prepare("SELECT id, account_number, user_id, account_type, opened_date, last_updated, balance from Accounts WHERE id = :q");
+  $r2 = $stmt2->execute([":q" => $query]);
   if ($r2) {
         $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     }
