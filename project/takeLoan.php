@@ -75,8 +75,8 @@ if(isset($_POST["save"])){
    
    $source = $_POST["source"];
    $query = null;
-   $stmt2 = $db->prepare("SELECT id, account_number, user_id, account_type, opened_date, last_updated, balance from Accounts WHERE id like :q");
-    $r2 = $stmt2->execute([":q" => "%$query%"]);
+   $stmt2 = $db->prepare("SELECT id, account_number, user_id, account_type, opened_date, last_updated, balance from Accounts");
+    $r2 = $stmt2->execute();
     if ($r2) {
           $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
       }

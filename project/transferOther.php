@@ -48,8 +48,8 @@ if ($r) {
 function do_bank_action($account1, $account2, $amountChange, $memo){
   $db = getDB();
   $query = "";
-  $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false' AND id = :q");
-  $r2 = $stmt2->execute([":q" => $query]);
+  $stmt2 = $db->prepare("SELECT * from Accounts WHERE active = 'active' AND frozen = 'false'");
+  $r2 = $stmt2->execute();
   if ($r2) {
         $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
     }
