@@ -133,7 +133,7 @@ if (isset($_POST["saved"])) {
                   $password = $_POST["password"];
                   $hash = password_hash($password, PASSWORD_BCRYPT);
                   $stmt = $db->prepare("UPDATE Users set password = :password where id = :id");
-                  $r = $stmt->execute([":id" => get_user_id(), ":password" => $hash]);
+                  $r = $stmt->execute([":id" => $id, ":password" => $hash]);
                   if ($r) {
                       flash("Reset Password");
                   }
