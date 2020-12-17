@@ -64,7 +64,7 @@ function do_bank_action($account1, $account2, $amountChange, $memo){
       $a2total = $r["balance"];
   }
   
-  if($a1total+$amountChange >= 0)
+  if($a1total-$amountChange >= 0)
   {
 	$query = "INSERT INTO `Transactions` (`act_src_id`, `act_dest_id`, `amount`, `action_type`, `expected_total`, `memo`) 
 	VALUES(:p1a1, :p1a2, :p1change, :type, :a1total, :memo), 
@@ -112,12 +112,11 @@ if (isset($_POST["save"])) {
     $user = get_user_id();
     
     $isValid = false;
-    $stmt = $db->prepare("SELECT * from Users WHERE id = :q");
-    $r = $stmt->execute([":q" => $query]);
+    $stmt = $db->prepare("SELECT * from Users");
+    $r = $stmt->execute();
     if ($r) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
     foreach($results as $curr)
     {
       if($curr["last_name"] == $lastName)
@@ -130,18 +129,18 @@ if (isset($_POST["save"])) {
         }
         foreach($results2 as $acc)
         {
-          if(substr($acc["account_number"], 8, 12) == $dest)
+          if(substr($acc["account_number"], 8) == $dest)
           {
             $isValid = true;
             $dest = $acc["id"];
             break;
           }
         }
-        if(strlen($dest > 4))
+        if($isValid)
           break;
       }
     }
-    
+
     if($isValid)
     {
       if($amount > 0 && $source != $dest)

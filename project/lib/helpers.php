@@ -84,7 +84,7 @@ function getMessages() {
 function calcLoanAPY(){
 	$db = getDB();
 	$numOfMonths = 1;//1 for monthly
-	$stmt = $db->prepare("SELECT id, APY, balance FROM Accounts WHERE account_type = 'Loan' AND IFNULL(nextAPY, TIMESTAMPADD(MONTH,:months,opened_date)) <= current_timestamp"); 
+	$stmt = $db->prepare("SELECT id, APY, balance FROM Accounts WHERE (account_type = 'Loan' OR account_type = 'Savings') AND IFNULL(nextAPY, TIMESTAMPADD(MONTH,:months,opened_date)) <= current_timestamp"); 
 	$r = $stmt->execute([":months"=>$numOfMonths]);
 	if($r){
 		$accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);

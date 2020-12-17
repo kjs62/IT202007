@@ -53,7 +53,7 @@ function do_bank_action($account1, $account2, $amountChange, $memo){
     if($account2 == $r["id"])
       $a2total = $r["balance"];
   }
-  if($a1total+$amountChange >= 0)
+  if($a1total-$amountChange >= 0)
   {
   	$query = "INSERT INTO `Transactions` (`act_src_id`, `act_dest_id`, `amount`, `action_type`, `expected_total`, `memo`) 
   	VALUES(:p1a1, :p1a2, :p1change, :type, :a1total, :memo), 

@@ -28,6 +28,11 @@ if(isset($_POST["save"])){
   if($balance >= 5)
   {
     do {
+      $accNum = rand(000000000000, 999999999999);
+      for($i = strlen($accNum); $i < 12; $i++)
+      {
+        $accNum = ("0" . $accNum);
+      }
       $stmt = $db->prepare("INSERT INTO Accounts (account_number, account_type, user_id, balance, APY) VALUES(:accNum, :accType, :user, :balance, :apy)");
   	$r = $stmt->execute([
   		":accNum"=>$accNum,
@@ -36,11 +41,6 @@ if(isset($_POST["save"])){
       ":apy" => $apy,
       ":balance"=>0
       ]);
-      $accNum = rand(000000000000, 999999999999);
-      for($i = strlen($accNum); $i < 12; $i++)
-      {
-        $accNum = ("0" . $accNum);
-      }
       $e = $stmt->errorInfo();
     }while($e[0] == "23000");
     $numOfMonths = 1;
